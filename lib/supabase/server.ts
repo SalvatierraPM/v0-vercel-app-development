@@ -11,3 +11,8 @@ export const createServerClient = () => {
 export const createActionClient = () => {
   return createServerActionClient<Database>({ cookies })
 }
+
+// Versión segura que no depende de next/headers
+export const createActionClientSafe = (cookieStore: any) => {
+  return createServerActionClient<Database>({ cookies: cookieStore })
+}
