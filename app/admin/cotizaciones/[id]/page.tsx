@@ -1,217 +1,207 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
-import type { Database } from "@/lib/supabase/database.types"
-import { redirect } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+"use client"
+
+import { useState, useEffect } from "react"
+import { useParams, useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { ArrowLeft, FileText, Calendar, User, MapPin, Phone, Mail, Building, DollarSign } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useToast } from "@/components/ui/use-toast"
 import CotizacionUploadFiles from "@/components/admin/CotizacionUploadFiles"
 import CotizacionComentarios from "@/components/admin/CotizacionComentarios"
 import CotizacionTareas from "@/components/admin/CotizacionTareas"
 
-export const dynamic = "force-dynamic"
+export default function DetalleCotizacion() {
+  const params = useParams()
+  const router = useRouter()
+  const { toast } = useToast()
+  const [cotizacion, setCotizacion] = useState<any | null>(null)
+  const [cargando, setCargando] = useState(true)
+  const [creandoProyecto, setCreandoProyecto] = useState(false)
+  const supabase = createClient()
+  const cotizacionId = params.id as string
 
-export default async function CotizacionDetalle({ params }: { params: { id: string } }) {
-  const supabase = createServerComponentClient<Database>({ cookies })
+  useEffect(() => {
+    async function cargarCotizacion() {
+      try {
+        const { data, error } = await supabase.from("cotizaciones").select("*").eq("id", cotizacionId).single()
 
-  // Verificar autenticación
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
-    redirect("/admin/login")
+        if (error) throw error
+        setCotizacion(data)
+      } catch (error) {
+        console.error("Error al cargar cotización:", error)
+        toast({
+          title: "Error",
+          description: "No se pudo cargar la cotización",
+          variant: "destructive",
+        })
+      } finally {
+        setCargando(false)
+      }
+    }
+
+    cargarCotizacion()
+  }, [cotizacionId])
+
+  async function crearProyecto() {
+    if (!cotizacion) return
+
+    setCreandoProyecto(true)
+    try {
+      // Redirigir a la página de creación de proyecto con el ID de la cotización
+      router.push(`/admin/proyectos/nuevo?cotizacion=${cotizacionId}`)
+    } catch (error) {
+      console.error("Error al crear proyecto:", error)
+      toast({
+        title: "Error",
+        description: "No se pudo crear el proyecto",
+        variant: "destructive",
+      })
+      setCreandoProyecto(false)
+    }
   }
 
-  // Obtener datos de la cotización
-  const { data: cotizacion, error } = await supabase
-    .from("cotizaciones")
-    .select(`
-      *,
-      branding_info (*)
-    `)
-    .eq("id", params.id)
-    .single()
-
-  if (error || !cotizacion) {
-    console.error("Error fetching cotizacion:", error)
+  if (cargando) {
     return (
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">Error</h1>
-        <p>No se pudo cargar la cotización. Por favor, intente nuevamente.</p>
-        <Button asChild className="mt-4">
-          <Link href="/admin/cotizaciones">Volver a cotizaciones</Link>
-        </Button>
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
       </div>
     )
   }
 
-  // Formatear la fase actual para mostrarla sin guiones bajos y con la primera letra en mayúscula
-  const formatearFase = (fase: string) => {
-    if (!fase) return "No definida"
-    return fase
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ")
+  if (!cotizacion) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <h1 className="text-2xl font-bold mb-4">Cotización no encontrada</h1>
+        <Button onClick={() => router.push("/admin/cotizaciones")}>Volver a cotizaciones</Button>
+      </div>
+    )
   }
 
+  // Formatear fecha
+  const fechaCreacion = new Date(cotizacion.created_at).toLocaleDateString("es-CL", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
+
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Detalle de Cotización</h1>
-        <Button asChild variant="outline">
-          <Link href="/admin/cotizaciones">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver a cotizaciones
-          </Link>
-        </Button>
+    <div className="container mx-auto py-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Detalle de Cotización</h1>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => router.push("/admin/cotizaciones")}>
+            Volver
+          </Button>
+          <Button onClick={crearProyecto} disabled={creandoProyecto}>
+            {creandoProyecto ? "Creando..." : "Crear Proyecto"}
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Información General</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-4">
-                  <div className="flex items-start gap-2">
-                    <FileText className="h-5 w-5 text-gray-500 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-gray-500">Proyecto</p>
-                      <p className="font-medium">{cotizacion.nombre_proyecto || "No especificado"}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2">
-                    <Calendar className="h-5 w-5 text-gray-500 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-gray-500">Fecha de creación</p>
-                      <p className="font-medium">
-                        {new Date(cotizacion.created_at).toLocaleDateString("es-ES", {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                        })}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2">
-                    <User className="h-5 w-5 text-gray-500 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-gray-500">Cliente</p>
-                      <p className="font-medium">{cotizacion.nombre_cliente || "No especificado"}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2">
-                    <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-gray-500">Ubicación</p>
-                      <p className="font-medium">{cotizacion.ubicacion || "No especificada"}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-start gap-2">
-                    <Phone className="h-5 w-5 text-gray-500 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-gray-500">Teléfono</p>
-                      <p className="font-medium">{cotizacion.telefono || "No especificado"}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2">
-                    <Mail className="h-5 w-5 text-gray-500 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-gray-500">Email</p>
-                      <p className="font-medium">{cotizacion.email || "No especificado"}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2">
-                    <Building className="h-5 w-5 text-gray-500 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-gray-500">Tipo de espacio</p>
-                      <p className="font-medium">{cotizacion.tipo_espacio || "No especificado"}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2">
-                    <DollarSign className="h-5 w-5 text-gray-500 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-gray-500">Presupuesto</p>
-                      <p className="font-medium">
-                        {cotizacion.presupuesto
-                          ? `$${Number.parseInt(cotizacion.presupuesto).toLocaleString("es-CL")}`
-                          : "No especificado"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Información del Cliente</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h3 className="font-semibold">Nombre</h3>
+                <p>{cotizacion.nombre}</p>
               </div>
-
-              <div className="mt-6 pt-4 border-t">
-                <h3 className="font-medium mb-2">Descripción del proyecto</h3>
-                <p className="text-gray-700">{cotizacion.descripcion_proyecto || "No hay descripción disponible."}</p>
+              <div>
+                <h3 className="font-semibold">Email</h3>
+                <p>{cotizacion.email}</p>
               </div>
-
-              <div className="mt-6 pt-4 border-t">
-                <h3 className="font-medium mb-2">Fase Actual</h3>
-                <div className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                  {formatearFase(cotizacion.estado)}
-                </div>
+              <div>
+                <h3 className="font-semibold">Teléfono</h3>
+                <p>{cotizacion.telefono || "No proporcionado"}</p>
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <h3 className="font-semibold">Fecha de creación</h3>
+                <p>{fechaCreacion}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          {cotizacion.branding_info && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Información de Branding</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {cotizacion.branding_info.tiene_branding && (
-                    <>
-                      <div>
-                        <h3 className="font-medium mb-1">Estado del branding</h3>
-                        <p>{cotizacion.branding_info.estado_branding || "No especificado"}</p>
-                      </div>
-
-                      {cotizacion.branding_info.colores_corporativos && (
-                        <div>
-                          <h3 className="font-medium mb-1">Colores corporativos</h3>
-                          <p>{cotizacion.branding_info.colores_corporativos}</p>
-                        </div>
-                      )}
-
-                      {cotizacion.branding_info.estilo_deseado && (
-                        <div>
-                          <h3 className="font-medium mb-1">Estilo deseado</h3>
-                          <p>{cotizacion.branding_info.estilo_deseado}</p>
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {!cotizacion.branding_info.tiene_branding && <p>El cliente no cuenta con branding establecido.</p>}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          <CotizacionUploadFiles cotizacionId={params.id} />
-        </div>
-
-        <div className="space-y-6">
-          <CotizacionTareas cotizacionId={params.id} />
-          <CotizacionComentarios cotizacionId={params.id} />
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Cotización</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div>
+                <h3 className="font-semibold">Rango en UF</h3>
+                <p>
+                  {cotizacion.cotizacion_uf_min} - {cotizacion.cotizacion_uf_max} UF
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold">Rango en CLP</h3>
+                <p>
+                  ${cotizacion.cotizacion_clp_min?.toLocaleString("es-CL") || 0} - $
+                  {cotizacion.cotizacion_clp_max?.toLocaleString("es-CL") || 0}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Detalles del Proyecto</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h3 className="font-semibold">Tipo de espacio</h3>
+                <p>{cotizacion.tipo_espacio}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold">Metros cuadrados</h3>
+                <p>{cotizacion.metros_cuadrados} m²</p>
+              </div>
+              <div>
+                <h3 className="font-semibold">Fase actual</h3>
+                <p>{cotizacion.estado?.replace(/_/g, " ") || "No especificada"}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold">Alcance</h3>
+                <p>{cotizacion.alcance?.replace(/_/g, " ") || "No especificado"}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold">Urgencia</h3>
+                <p>{cotizacion.urgencia || "No especificada"}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold">Presupuesto</h3>
+                <p>{cotizacion.presupuesto || "No especificado"}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Tabs defaultValue="archivos">
+        <TabsList>
+          <TabsTrigger value="archivos">Archivos</TabsTrigger>
+          <TabsTrigger value="comentarios">Comentarios</TabsTrigger>
+          <TabsTrigger value="tareas">Tareas</TabsTrigger>
+        </TabsList>
+        <TabsContent value="archivos" className="space-y-4">
+          <CotizacionUploadFiles cotizacionId={cotizacionId} />
+        </TabsContent>
+        <TabsContent value="comentarios">
+          <CotizacionComentarios cotizacionId={cotizacionId} />
+        </TabsContent>
+        <TabsContent value="tareas">
+          <CotizacionTareas cotizacionId={cotizacionId} />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
