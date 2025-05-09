@@ -14,6 +14,8 @@ const nextConfig = {
     unoptimized: true,
   },
   transpilePackages: ["@supabase/auth-helpers-nextjs"],
+  // Ignorar completamente el directorio pages/
+  pageExtensions: ['tsx', 'ts', 'jsx', 'js'].map(ext => `app.${ext}`),
 }
 
 export default nextConfig

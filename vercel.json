@@ -1,0 +1,6 @@
+{
+  "buildCommand": "node scripts/clean-pages.js && next build",
+  "ignoreCommand": "node -e \"process.exit(0)\"",
+  "installCommand": "npm install",
+  "outputDirectory": ".next"
+}
