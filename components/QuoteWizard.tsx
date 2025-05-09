@@ -8,7 +8,6 @@ import { z } from "zod"
 import StepIndicator from "./StepIndicator"
 import { calculateEstimate } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
-import { X, Upload, FileText, ImageIcon, File } from "lucide-react"
 
 // Esquema de validación con Zod
 const quoteFormSchema = z.object({
@@ -45,42 +44,6 @@ interface QuoteWizardProps {
     },
     cotizacionId: string,
   ) => void
-}
-
-// Función para obtener el tipo de archivo
-const getFileType = (file: File): string => {
-  const extension = file.name.split(".").pop()?.toLowerCase() || ""
-
-  if (["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(extension)) {
-    return "imagen"
-  } else if (["pdf", "doc", "docx", "txt", "rtf"].includes(extension)) {
-    return "documento"
-  } else if (["ai", "psd", "xd", "sketch", "fig"].includes(extension)) {
-    return "diseno"
-  } else if (["mp4", "mov", "avi", "webm"].includes(extension)) {
-    return "video"
-  }
-
-  return "otro"
-}
-
-// Función para obtener el icono según el tipo de archivo
-const getFileIcon = (file: File) => {
-  const extension = file.name.split(".").pop()?.toLowerCase() || ""
-
-  if (["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(extension)) {
-    return <ImageIcon className="w-5 h-5 text-blue-500" />
-  } else if (["pdf"].includes(extension)) {
-    return <FileText className="w-5 h-5 text-red-500" />
-  } else if (["doc", "docx", "txt", "rtf"].includes(extension)) {
-    return <FileText className="w-5 h-5 text-blue-500" />
-  } else if (["ai", "psd", "xd", "sketch", "fig"].includes(extension)) {
-    return <File className="w-5 h-5 text-purple-500" />
-  } else if (["mp4", "mov", "avi", "webm"].includes(extension)) {
-    return <File className="w-5 h-5 text-green-500" />
-  }
-
-  return <File className="w-5 h-5 text-gray-500" />
 }
 
 export default function QuoteWizard({ onComplete }: QuoteWizardProps) {
@@ -140,31 +103,27 @@ export default function QuoteWizard({ onComplete }: QuoteWizardProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const fileList = Array.from(e.target.files)
-      if (fileList.length > 10) {
-        alert("Puedes subir un máximo de 10 archivos")
+      if (fileList.length > 5) {
+        alert("Puedes subir un máximo de 5 archivos")
         return
       }
 
       const validFiles = fileList.filter((file) => {
-        if (file.size > 10 * 1024 * 1024) {
-          alert(`El archivo ${file.name} excede el tamaño máximo de 10MB`)
+        if (file.size > 5 * 1024 * 1024) {
+          alert(`El archivo ${file.name} excede el tamaño máximo de 5MB`)
           return false
         }
         return true
       })
 
-      setSelectedFiles([...selectedFiles, ...validFiles])
+      setSelectedFiles(validFiles)
     }
-  }
-
-  const removeFile = (index: number) => {
-    setSelectedFiles(selectedFiles.filter((_, i) => i !== index))
   }
 
   const uploadFiles = async (cotizacionId: string) => {
     const uploadPromises = selectedFiles.map(async (file) => {
       const fileExt = file.name.split(".").pop()
-      const fileName = `${cotizacionId}/${Date.now()}-${file.name}`
+      const fileName = `${cotizacionId}/${Date.now()}.${fileExt}`
       const { data, error } = await supabase.storage.from("cotizaciones").upload(fileName, file)
 
       if (error) {
@@ -181,8 +140,6 @@ export default function QuoteWizard({ onComplete }: QuoteWizardProps) {
         url: publicUrl,
         nombre: file.name,
         cotizacion_id: cotizacionId,
-        tipo: getFileType(file),
-        tamano: file.size,
       }
     })
 
@@ -218,6 +175,11 @@ export default function QuoteWizard({ onComplete }: QuoteWizardProps) {
             cotizacion_uf_max: estimate.ufMax,
             cotizacion_clp_min: estimate.clpMin,
             cotizacion_clp_max: estimate.clpMax,
+            tipo_branding: data.tipo_branding || null,
+            industria: data.industria || null,
+            tiene_logo: data.tiene_logo || false,
+            tiene_materiales: data.tiene_materiales || false,
+            descripcion_proyecto: data.descripcion_proyecto || null,
           })
           .select()
           .single()
@@ -634,6 +596,99 @@ export default function QuoteWizard({ onComplete }: QuoteWizardProps) {
           </div>
         )}
 
+        {/* Paso 4 (o 5 si es ambos): Datos de contacto y archivos */}
+        {((tipoServicio !== "ambos" && currentStep === 4) || (tipoServicio === "ambos" && currentStep === 5)) && (
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold">Datos de contacto</h2>
+
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
+                  Nombre completo
+                </label>
+                <input
+                  type="text"
+                  id="nombre"
+                  className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#9A9065]"
+                  placeholder="Tu nombre"
+                  {...register("nombre")}
+                />
+                {errors.nombre && <p className="text-red-500 text-sm">{errors.nombre.message}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#9A9065]"
+                  placeholder="tu@email.com"
+                  {...register("email")}
+                />
+                {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-1">
+                  Teléfono (opcional, para WhatsApp)
+                </label>
+                <input
+                  type="tel"
+                  id="telefono"
+                  className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#9A9065]"
+                  placeholder="+56 9 1234 5678"
+                  {...register("telefono")}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Imágenes de referencia (opcional)
+                </label>
+                <div
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    if (e.dataTransfer.files) {
+                      const fileList = Array.from(e.dataTransfer.files)
+                      setSelectedFiles(fileList.slice(0, 5))
+                    }
+                  }}
+                >
+                  <input
+                    type="file"
+                    id="archivos"
+                    className="hidden"
+                    multiple
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                  <label htmlFor="archivos" className="cursor-pointer text-[#9A9065] hover:text-[#827753]">
+                    Seleccionar archivos
+                  </label>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Arrastra y suelta archivos aquí o haz clic para seleccionar
+                  </p>
+                </div>
+                {selectedFiles.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-sm font-medium text-gray-700">Archivos seleccionados:</p>
+                    <ul className="text-sm text-gray-500">
+                      {selectedFiles.map((file, index) => (
+                        <li key={index}>{file.name}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <p className="text-sm text-gray-500 mt-1">Puedes subir hasta 5 imágenes (máx. 5MB cada una)</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Paso adicional para "ambos" servicios */}
         {tipoServicio === "ambos" && currentStep === 4 && (
           <div className="space-y-6">
@@ -720,129 +775,6 @@ export default function QuoteWizard({ onComplete }: QuoteWizardProps) {
                   placeholder="Cuéntanos sobre tu marca, valores, público objetivo..."
                   {...register("descripcion_proyecto")}
                 ></textarea>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Paso 4 (o 5 si es ambos): Datos de contacto y archivos */}
-        {((tipoServicio !== "ambos" && currentStep === 4) || (tipoServicio === "ambos" && currentStep === 5)) && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold">Datos de contacto</h2>
-
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
-                  Nombre completo
-                </label>
-                <input
-                  type="text"
-                  id="nombre"
-                  className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#9A9065]"
-                  placeholder="Tu nombre"
-                  {...register("nombre")}
-                />
-                {errors.nombre && <p className="text-red-500 text-sm">{errors.nombre.message}</p>}
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#9A9065]"
-                  placeholder="tu@email.com"
-                  {...register("email")}
-                />
-                {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
-              </div>
-
-              <div>
-                <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-1">
-                  Teléfono (opcional, para WhatsApp)
-                </label>
-                <input
-                  type="tel"
-                  id="telefono"
-                  className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#9A9065]"
-                  placeholder="+56 9 1234 5678"
-                  {...register("telefono")}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Archivos de referencia (opcional)
-                </label>
-                <div
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => {
-                    e.preventDefault()
-                    if (e.dataTransfer.files) {
-                      const fileList = Array.from(e.dataTransfer.files)
-                      if (fileList.length + selectedFiles.length > 10) {
-                        alert("Puedes subir un máximo de 10 archivos en total")
-                        return
-                      }
-                      setSelectedFiles([...selectedFiles, ...fileList.slice(0, 10 - selectedFiles.length)])
-                    }
-                  }}
-                >
-                  <div className="flex flex-col items-center">
-                    <Upload className="h-10 w-10 text-gray-400 mb-2" />
-                    <input
-                      type="file"
-                      id="archivos"
-                      className="hidden"
-                      multiple
-                      accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.adobe.illustrator,application/postscript,application/x-photoshop,application/octet-stream,video/*"
-                      onChange={handleFileChange}
-                    />
-                    <label htmlFor="archivos" className="cursor-pointer text-[#9A9065] hover:text-[#827753]">
-                      Seleccionar archivos
-                    </label>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Arrastra y suelta archivos aquí o haz clic para seleccionar
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Puedes subir imágenes, documentos, archivos de diseño y videos (máx. 10MB cada uno)
-                    </p>
-                  </div>
-                </div>
-
-                {selectedFiles.length > 0 && (
-                  <div className="mt-4">
-                    <p className="text-sm font-medium text-gray-700 mb-2">
-                      Archivos seleccionados ({selectedFiles.length}/10):
-                    </p>
-                    <div className="space-y-2 max-h-60 overflow-y-auto p-2 border border-gray-200 rounded-md">
-                      {selectedFiles.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                          <div className="flex items-center">
-                            {getFileIcon(file)}
-                            <span className="ml-2 text-sm truncate max-w-xs">{file.name}</span>
-                            <span className="ml-2 text-xs text-gray-500">
-                              ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                            </span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => removeFile(index)}
-                            className="text-red-500 hover:text-red-700"
-                            aria-label="Eliminar archivo"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <p className="text-sm text-gray-500 mt-2">Puedes subir hasta 10 archivos (máx. 10MB cada uno)</p>
               </div>
             </div>
           </div>

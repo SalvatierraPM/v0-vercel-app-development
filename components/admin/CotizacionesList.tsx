@@ -7,27 +7,9 @@ import { formatCLP, formatUF } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { FileText, ImageIcon, File, ExternalLink, Download } from "lucide-react"
 
 interface CotizacionesListProps {
   cotizaciones: any[]
-}
-
-// Función para obtener el icono según el tipo de archivo
-const getFileIcon = (tipo: string, extension: string) => {
-  if (tipo === "imagen" || ["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(extension)) {
-    return <ImageIcon className="w-5 h-5 text-blue-500" />
-  } else if (["pdf"].includes(extension)) {
-    return <FileText className="w-5 h-5 text-red-500" />
-  } else if (["doc", "docx", "txt", "rtf"].includes(extension)) {
-    return <FileText className="w-5 h-5 text-blue-500" />
-  } else if (["ai", "psd", "xd", "sketch", "fig"].includes(extension)) {
-    return <File className="w-5 h-5 text-purple-500" />
-  } else if (["mp4", "mov", "avi", "webm"].includes(extension)) {
-    return <File className="w-5 h-5 text-green-500" />
-  }
-
-  return <File className="w-5 h-5 text-gray-500" />
 }
 
 export default function CotizacionesList({ cotizaciones: initialCotizaciones }: CotizacionesListProps) {
@@ -36,8 +18,6 @@ export default function CotizacionesList({ cotizaciones: initialCotizaciones }: 
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCotizacion, setSelectedCotizacion] = useState<any | null>(null)
   const [filter, setFilter] = useState<string>("todas")
-  const [archivos, setArchivos] = useState<any[]>([])
-  const [loadingArchivos, setLoadingArchivos] = useState(false)
   const supabase = createClient()
   const router = useRouter()
 
@@ -63,30 +43,12 @@ export default function CotizacionesList({ cotizaciones: initialCotizaciones }: 
     setFilter(e.target.value)
   }
 
-  const handleViewDetails = async (cotizacion: any) => {
+  const handleViewDetails = (cotizacion: any) => {
     setSelectedCotizacion(cotizacion)
-
-    // Cargar archivos asociados a la cotización
-    setLoadingArchivos(true)
-    try {
-      const { data, error } = await supabase
-        .from("archivos_cotizacion")
-        .select("*")
-        .eq("cotizacion_id", cotizacion.id)
-        .order("created_at", { ascending: false })
-
-      if (error) throw error
-      setArchivos(data || [])
-    } catch (error) {
-      console.error("Error al cargar archivos:", error)
-    } finally {
-      setLoadingArchivos(false)
-    }
   }
 
   const handleCloseDetails = () => {
     setSelectedCotizacion(null)
-    setArchivos([])
   }
 
   const handleUpdateStatus = async (id: string, newStatus: string) => {
@@ -117,24 +79,13 @@ export default function CotizacionesList({ cotizaciones: initialCotizaciones }: 
     const matchesSearch =
       cotizacion.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cotizacion.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cotizacion.tipo_espacio?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (cotizacion.tipo_servicio && cotizacion.tipo_servicio.toLowerCase().includes(searchTerm.toLowerCase()))
+      cotizacion.tipo_espacio?.toLowerCase().includes(searchTerm.toLowerCase())
 
-    let matchesFilter = filter === "todas"
-
-    if (filter === "pendientes") {
-      matchesFilter = !cotizacion.estado || cotizacion.estado === "pendiente"
-    } else if (filter === "aprobadas") {
-      matchesFilter = cotizacion.estado === "aprobada"
-    } else if (filter === "rechazadas") {
-      matchesFilter = cotizacion.estado === "rechazada"
-    } else if (filter === "diseno_interiores") {
-      matchesFilter = cotizacion.tipo_servicio === "diseno_interiores"
-    } else if (filter === "branding") {
-      matchesFilter = cotizacion.tipo_servicio === "branding"
-    } else if (filter === "ambos") {
-      matchesFilter = cotizacion.tipo_servicio === "ambos"
-    }
+    const matchesFilter =
+      filter === "todas" ||
+      (filter === "pendientes" && (!cotizacion.estado || cotizacion.estado === "pendiente")) ||
+      (filter === "aprobadas" && cotizacion.estado === "aprobada") ||
+      (filter === "rechazadas" && cotizacion.estado === "rechazada")
 
     return matchesSearch && matchesFilter
   })
@@ -181,9 +132,6 @@ export default function CotizacionesList({ cotizaciones: initialCotizaciones }: 
               <option value="pendientes">Pendientes</option>
               <option value="aprobadas">Aprobadas</option>
               <option value="rechazadas">Rechazadas</option>
-              <option value="diseno_interiores">Diseño de interiores</option>
-              <option value="branding">Branding</option>
-              <option value="ambos">Ambos servicios</option>
             </select>
           </div>
         </div>
@@ -198,9 +146,7 @@ export default function CotizacionesList({ cotizaciones: initialCotizaciones }: 
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Cliente
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Servicio
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Cotización
                 </th>
@@ -223,15 +169,7 @@ export default function CotizacionesList({ cotizaciones: initialCotizaciones }: 
                       <div className="text-sm font-medium text-gray-900">{cotizacion.nombre}</div>
                       <div className="text-sm text-gray-500">{cotizacion.email}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {cotizacion.tipo_servicio === "diseno_interiores"
-                        ? "Diseño de interiores"
-                        : cotizacion.tipo_servicio === "branding"
-                          ? "Branding"
-                          : cotizacion.tipo_servicio === "ambos"
-                            ? "Diseño + Branding"
-                            : cotizacion.tipo_espacio || "No especificado"}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cotizacion.tipo_espacio}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatUF(cotizacion.cotizacion_uf_min)} - {formatUF(cotizacion.cotizacion_uf_max)} UF
                     </td>
@@ -320,69 +258,23 @@ export default function CotizacionesList({ cotizaciones: initialCotizaciones }: 
                   <h3 className="text-lg font-medium mb-3">Detalles del proyecto</h3>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <p className="mb-2">
-                      <span className="font-medium">Tipo de servicio:</span>{" "}
-                      {selectedCotizacion.tipo_servicio === "diseno_interiores"
-                        ? "Diseño de interiores"
-                        : selectedCotizacion.tipo_servicio === "branding"
-                          ? "Branding"
-                          : selectedCotizacion.tipo_servicio === "ambos"
-                            ? "Diseño + Branding"
-                            : "No especificado"}
+                      <span className="font-medium">Tipo de espacio:</span> {selectedCotizacion.tipo_espacio}
                     </p>
-
-                    {(selectedCotizacion.tipo_servicio === "diseno_interiores" ||
-                      selectedCotizacion.tipo_servicio === "ambos") && (
-                      <>
-                        <p className="mb-2">
-                          <span className="font-medium">Tipo de espacio:</span> {selectedCotizacion.tipo_espacio || "-"}
-                        </p>
-                        <p className="mb-2">
-                          <span className="font-medium">Metros cuadrados:</span>{" "}
-                          {selectedCotizacion.metros_cuadrados || "-"} m²
-                        </p>
-                        <p className="mb-2">
-                          <span className="font-medium">Estado:</span>{" "}
-                          {selectedCotizacion.estado?.replace("_", " ") || "-"}
-                        </p>
-                        <p className="mb-2">
-                          <span className="font-medium">Alcance:</span>{" "}
-                          {selectedCotizacion.alcance?.replace("_", " ") || "-"}
-                        </p>
-                      </>
-                    )}
-
-                    {(selectedCotizacion.tipo_servicio === "branding" ||
-                      selectedCotizacion.tipo_servicio === "ambos") && (
-                      <>
-                        <p className="mb-2">
-                          <span className="font-medium">Tipo de branding:</span>{" "}
-                          {selectedCotizacion.tipo_branding?.replace("_", " ") || "-"}
-                        </p>
-                        <p className="mb-2">
-                          <span className="font-medium">Industria:</span> {selectedCotizacion.industria || "-"}
-                        </p>
-                        <p className="mb-2">
-                          <span className="font-medium">Tiene logo:</span> {selectedCotizacion.tiene_logo ? "Sí" : "No"}
-                        </p>
-                        <p className="mb-2">
-                          <span className="font-medium">Tiene materiales:</span>{" "}
-                          {selectedCotizacion.tiene_materiales ? "Sí" : "No"}
-                        </p>
-                      </>
-                    )}
-
+                    <p className="mb-2">
+                      <span className="font-medium">Metros cuadrados:</span> {selectedCotizacion.metros_cuadrados} m²
+                    </p>
+                    <p className="mb-2">
+                      <span className="font-medium">Estado:</span> {selectedCotizacion.estado.replace("_", " ")}
+                    </p>
+                    <p className="mb-2">
+                      <span className="font-medium">Alcance:</span> {selectedCotizacion.alcance.replace("_", " ")}
+                    </p>
                     <p className="mb-2">
                       <span className="font-medium">Urgencia:</span> {selectedCotizacion.urgencia}
                     </p>
                     <p className="mb-2">
                       <span className="font-medium">Presupuesto:</span> {selectedCotizacion.presupuesto || "-"}
                     </p>
-
-                    {selectedCotizacion.descripcion_proyecto && (
-                      <p className="mb-2">
-                        <span className="font-medium">Descripción:</span> {selectedCotizacion.descripcion_proyecto}
-                      </p>
-                    )}
                   </div>
                 </div>
               </div>
@@ -406,60 +298,6 @@ export default function CotizacionesList({ cotizaciones: initialCotizaciones }: 
                       </p>
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Archivos adjuntos */}
-              <div className="mt-6">
-                <h3 className="text-lg font-medium mb-3">Archivos adjuntos</h3>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  {loadingArchivos ? (
-                    <p className="text-center py-4 text-gray-500">Cargando archivos...</p>
-                  ) : archivos.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {archivos.map((archivo) => {
-                        const extension = archivo.nombre.split(".").pop()?.toLowerCase() || ""
-                        return (
-                          <div
-                            key={archivo.id}
-                            className="flex items-center p-2 border border-gray-200 rounded-md bg-white hover:bg-gray-50"
-                          >
-                            {getFileIcon(archivo.tipo || "", extension)}
-                            <div className="ml-3 flex-1 truncate">
-                              <p className="text-sm font-medium text-gray-900 truncate">{archivo.nombre}</p>
-                              <p className="text-xs text-gray-500">
-                                {archivo.tipo || extension} •{" "}
-                                {archivo.tamano
-                                  ? `${(archivo.tamano / 1024 / 1024).toFixed(2)} MB`
-                                  : "Tamaño desconocido"}
-                              </p>
-                            </div>
-                            <div className="flex space-x-2">
-                              <a
-                                href={archivo.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800"
-                                title="Ver archivo"
-                              >
-                                <ExternalLink className="h-4 w-4" />
-                              </a>
-                              <a
-                                href={archivo.url}
-                                download
-                                className="text-green-600 hover:text-green-800"
-                                title="Descargar archivo"
-                              >
-                                <Download className="h-4 w-4" />
-                              </a>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  ) : (
-                    <p className="text-center py-4 text-gray-500">No hay archivos adjuntos a esta cotización</p>
-                  )}
                 </div>
               </div>
 

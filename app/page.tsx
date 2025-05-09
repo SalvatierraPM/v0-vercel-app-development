@@ -4,7 +4,7 @@ import type React from "react"
 
 import Link from "next/link"
 import { useState } from "react"
-import { ArrowRight, ChevronRight, MapPin, Mail, Phone, X, Loader2, User } from "lucide-react"
+import { ArrowRight, ChevronRight, MapPin, Mail, Phone, X, Loader2 } from "lucide-react"
 
 export default function Home() {
   const [selectedProject, setSelectedProject] = useState<number | null>(null)
@@ -22,7 +22,6 @@ export default function Home() {
     status: "idle",
     message: "",
   })
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const handleContactInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -167,13 +166,6 @@ export default function Home() {
             >
               Cotiza tu proyecto
             </Link>
-            <Link
-              href="/admin/login"
-              className="text-[#555555] hover:text-[#9A9065] font-light transition-colors"
-              aria-label="Acceso administrador"
-            >
-              <User size={20} />
-            </Link>
           </nav>
           <div className="md:hidden flex items-center">
             <Link
@@ -182,7 +174,7 @@ export default function Home() {
             >
               Cotizar
             </Link>
-            <button className="text-[#555555] hover:text-[#9A9065]" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <button className="text-[#555555] hover:text-[#9A9065]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6"
@@ -194,30 +186,6 @@ export default function Home() {
               </svg>
             </button>
           </div>
-          {isMenuOpen && (
-            <div className="md:hidden absolute top-16 right-0 left-0 bg-white shadow-md p-4 z-50">
-              <div className="flex flex-col space-y-4">
-                <Link href="#proyectos" className="text-[#555555] hover:text-[#9A9065] font-light transition-colors">
-                  Proyectos
-                </Link>
-                <Link href="#estudio" className="text-[#555555] hover:text-[#9A9065] font-light transition-colors">
-                  Estudio
-                </Link>
-                <Link href="#servicios" className="text-[#555555] hover:text-[#9A9065] font-light transition-colors">
-                  Servicios
-                </Link>
-                <Link href="#contacto" className="text-[#555555] hover:text-[#9A9065] font-light transition-colors">
-                  Contacto
-                </Link>
-                <Link
-                  href="/admin/login"
-                  className="text-[#555555] hover:text-[#9A9065] font-light transition-colors flex items-center gap-2"
-                >
-                  <User size={18} /> Admin
-                </Link>
-              </div>
-            </div>
-          )}
         </div>
       </header>
 

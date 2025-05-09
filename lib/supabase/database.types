@@ -1,10 +1,4 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export interface Database {
   public: {
@@ -105,56 +99,6 @@ export interface Database {
           role?: string
         }
       }
-      proyectos: {
-        Row: {
-          id: string
-          created_at: string
-          nombre: string
-          descripcion: string | null
-          cotizacion_id: string | null
-          cliente_nombre: string
-          cliente_email: string
-          cliente_telefono: string | null
-          fecha_inicio: string
-          fecha_fin_estimada: string | null
-          presupuesto_total: number
-          porcentaje_completado: number
-          estado: string
-          etapa_id: string | null
-        }
-        Insert: {
-          id?: string
-          created_at?: string
-          nombre: string
-          descripcion: string | null
-          cotizacion_id: string | null
-          cliente_nombre: string
-          cliente_email: string
-          cliente_telefono: string | null
-          fecha_inicio: string
-          fecha_fin_estimada: string | null
-          presupuesto_total: number
-          porcentaje_completado: number
-          estado: string
-          etapa_id: string | null
-        }
-        Update: {
-          id?: string
-          created_at?: string
-          nombre?: string
-          descripcion?: string | null
-          cotizacion_id?: string | null
-          cliente_nombre?: string
-          cliente_email?: string
-          cliente_telefono?: string | null
-          fecha_inicio?: string
-          fecha_fin_estimada?: string | null
-          presupuesto_total?: number
-          porcentaje_completado?: number
-          estado?: string
-          etapa_id?: string | null
-        }
-      }
       proyecto_etapas: {
         Row: {
           id: string
@@ -178,33 +122,97 @@ export interface Database {
           orden?: number
         }
       }
-      password_reset_tokens: {
+      proyectos: {
         Row: {
           id: string
+          nombre: string
+          descripcion: string | null
+          cotizacion_id: string | null
+          cliente_nombre: string
+          cliente_email: string
+          cliente_telefono: string | null
+          fecha_inicio: string
+          fecha_fin_estimada: string | null
+          presupuesto_total: number
+          porcentaje_completado: number
+          estado: string
+          etapa_id: string | null
+        }
+        Insert: {
+          id?: string
+          nombre: string
+          descripcion: string | null
+          cotizacion_id: string | null
+          cliente_nombre: string
+          cliente_email: string
+          cliente_telefono: string | null
+          fecha_inicio: string
+          fecha_fin_estimada: string | null
+          presupuesto_total: number
+          porcentaje_completado: number
+          estado: string
+          etapa_id: string | null
+        }
+        Update: {
+          id?: string
+          nombre?: string
+          descripcion?: string | null
+          cotizacion_id?: string | null
+          cliente_nombre?: string
+          cliente_email?: string
+          cliente_telefono?: string | null
+          fecha_inicio?: string
+          fecha_fin_estimada?: string | null
+          presupuesto_total?: number
+          porcentaje_completado?: number
+          estado?: string
+          etapa_id?: string | null
+        }
+      }
+      password_reset_tokens: {
+        Row: {
           email: string
           token: string
           user_id: string
-          created_at: string
           expires_at: string
           used: boolean
         }
         Insert: {
-          id?: string
           email: string
           token: string
           user_id: string
-          created_at?: string
           expires_at: string
           used?: boolean
         }
         Update: {
-          id?: string
           email?: string
           token?: string
           user_id?: string
-          created_at?: string
           expires_at?: string
           used?: boolean
+        }
+      }
+      cotizacion_etapas: {
+        Row: {
+          id: string
+          nombre: string
+          descripcion: string | null
+          color: string
+          orden: number
+        }
+        Insert: {
+          id?: string
+          nombre: string
+          descripcion: string | null
+          color: string
+          orden: number
+        }
+        Update: {
+          id?: string
+          nombre?: string
+          descripcion?: string | null
+          color?: string
+          orden?: number
         }
       }
     }
