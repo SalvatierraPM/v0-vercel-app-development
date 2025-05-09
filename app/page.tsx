@@ -3,7 +3,6 @@
 import type React from "react"
 
 import Link from "next/link"
-import Image from "next/image"
 import { useState } from "react"
 import { ArrowRight, ChevronRight, MapPin, Mail, Phone, X, Loader2, User } from "lucide-react"
 
@@ -297,22 +296,6 @@ export default function Home() {
                 presente en todo proceso de diseño.
               </p>
             </div>
-
-            {/* Imagen de las fundadoras trabajando juntas */}
-            <div className="mt-12">
-              <div className="rounded-lg overflow-hidden shadow-md">
-                <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/maca%20y%20cata.jpg-okaSYWXXzH3vT7aM5RRQi3lQornD5f.jpeg"
-                  alt="Catalina Soffia y Macarena Whittle, fundadoras de Estudio Well"
-                  width={1000}
-                  height={667}
-                  className="w-full h-auto"
-                />
-              </div>
-              <p className="text-center text-[#9A9065] mt-4 italic">
-                "Creemos en el poder transformador del diseño para crear espacios que inspiren bienestar"
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -356,13 +339,7 @@ export default function Home() {
             <div className="flex flex-col md:flex-row gap-6">
               <div className="md:w-1/3">
                 <div className="aspect-square rounded-md overflow-hidden">
-                  <Image
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/cata-leotGWFiUkhGmInYvnSUcqss5VB6GD.jpeg"
-                    alt="Catalina Soffia"
-                    width={500}
-                    height={500}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src="/catalina-soffia.png" alt="Catalina Soffia" className="w-full h-full object-cover" />
                 </div>
               </div>
               <div className="md:w-2/3">
@@ -379,13 +356,7 @@ export default function Home() {
             <div className="flex flex-col md:flex-row gap-6">
               <div className="md:w-1/3">
                 <div className="aspect-square rounded-md overflow-hidden">
-                  <Image
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/maca.jpg-wT6HYwEwcVeojRtXSEU8w3VKjpKSDm.jpeg"
-                    alt="Macarena Whittle"
-                    width={500}
-                    height={500}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src="/macarena-whittle.png" alt="Macarena Whittle" className="w-full h-full object-cover" />
                 </div>
               </div>
               <div className="md:w-2/3">

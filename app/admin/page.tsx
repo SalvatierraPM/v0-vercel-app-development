@@ -1,20 +1,34 @@
-"use client"
+import { createServerClient } from "@/lib/supabase/server"
+import { redirect } from "next/navigation"
+import AdminPanel from "@/components/AdminPanel"
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+export default async function AdminPage() {
+  const supabase = createServerClient()
 
-export default function AdminPage() {
-  const router = useRouter()
+  // Verificar autenticación
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
-  useEffect(() => {
-    // Redirigir al dashboard de administración
-    router.push("/admin/dashboard")
-  }, [])
+  if (!session) {
+    redirect("/admin/login")
+  }
 
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <h1 className="text-4xl font-bold">Panel de Administración</h1>
-      <p className="mt-4 text-xl">Cargando...</p>
-    </main>
-  )
+  // Verificar si el usuario es administrador
+  const { data: adminUser } = await supabase.from("admin_users").select("*").eq("email", session.user.email).single()
+
+  if (!adminUser) {
+    redirect("/admin/unauthorized")
+  }
+
+  // Obtener cotizaciones
+  const { data: cotizaciones } = await supabase
+    .from("cotizaciones")
+    .select(`
+      *,
+      archivos_cotizacion (*)
+    `)
+    .order("created_at", { ascending: false })
+
+  return <AdminPanel cotizaciones={cotizaciones || []} />
 }
