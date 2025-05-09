@@ -1,355 +1,349 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[];
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export interface Database {
   public: {
     Tables: {
-      admin_users: {
-        Row: {
-          id: string;
-          email: string;
-          created_at: string;
-          role: string;
-          nombre: string | null;
-          cargo: string | null;
-          activo: boolean | null;
-        };
-        Insert: {
-          id?: string;
-          email: string;
-          created_at?: string;
-          role?: string;
-          nombre?: string | null;
-          cargo?: string | null;
-          activo?: boolean | null;
-        };
-        Update: {
-          id?: string;
-          email?: string;
-          created_at?: string;
-          role?: string;
-          nombre?: string | null;
-          cargo?: string | null;
-          activo?: boolean | null;
-        };
-      };
-      archivos_cotizacion: {
-        Row: {
-          id: string;
-          cotizacion_id: string;
-          created_at: string;
-          url: string;
-          nombre: string;
-          tipo: string | null;
-          tamano: number | null;
-        };
-        Insert: {
-          id?: string;
-          cotizacion_id: string;
-          created_at?: string;
-          url: string;
-          nombre: string;
-          tipo?: string | null;
-          tamano?: number | null;
-        };
-        Update: {
-          id?: string;
-          cotizacion_id?: string;
-          created_at?: string;
-          url?: string;
-          nombre?: string;
-          tipo?: string | null;
-          tamano?: number | null;
-        };
-      };
       cotizaciones: {
         Row: {
-          id: string;
-          created_at: string;
-          nombre: string;
-          email: string;
-          telefono: string | null;
-          tipo_espacio: string | null;
-          metros_cuadrados: number | null;
-          estado: string | null;
-          alcance: string | null;
-          urgencia: string;
-          presupuesto: string | null;
-          cotizacion_uf_min: number;
-          cotizacion_uf_max: number;
-          cotizacion_clp_min: number;
-          cotizacion_clp_max: number;
-          tipo_servicio: string;
-          nombre_proyecto: string | null;
-          ubicacion: string | null;
-        };
+          id: string
+          created_at: string
+          nombre: string
+          email: string
+          telefono: string | null
+          tipo_espacio: string | null
+          metros_cuadrados: number | null
+          estado: string | null
+          alcance: string | null
+          urgencia: string
+          presupuesto: string | null
+          cotizacion_uf_min: number
+          cotizacion_uf_max: number
+          cotizacion_clp_min: number
+          cotizacion_clp_max: number
+          tipo_servicio: string
+          nombre_proyecto: string | null
+          ubicacion: string | null
+        }
         Insert: {
-          id?: string;
-          created_at?: string;
-          nombre: string;
-          email: string;
-          telefono?: string | null;
-          tipo_espacio?: string | null;
-          metros_cuadrados?: number | null;
-          estado?: string | null;
-          alcance?: string | null;
-          urgencia: string;
-          presupuesto?: string | null;
-          cotizacion_uf_min: number;
-          cotizacion_uf_max: number;
-          cotizacion_clp_min: number;
-          cotizacion_clp_max: number;
-          tipo_servicio: string;
-          nombre_proyecto?: string | null;
-          ubicacion?: string | null;
-        };
+          id?: string
+          created_at?: string
+          nombre: string
+          email: string
+          telefono?: string | null
+          tipo_espacio?: string | null
+          metros_cuadrados?: number | null
+          estado?: string | null
+          alcance?: string | null
+          urgencia: string
+          presupuesto?: string | null
+          cotizacion_uf_min: number
+          cotizacion_uf_max: number
+          cotizacion_clp_min: number
+          cotizacion_clp_max: number
+          tipo_servicio: string
+          nombre_proyecto?: string | null
+          ubicacion?: string | null
+        }
         Update: {
-          id?: string;
-          created_at?: string;
-          nombre?: string;
-          email?: string;
-          telefono?: string | null;
-          tipo_espacio?: string | null;
-          metros_cuadrados?: number | null;
-          estado?: string | null;
-          alcance?: string | null;
-          urgencia?: string;
-          presupuesto?: string | null;
-          cotizacion_uf_min?: number;
-          cotizacion_uf_max?: number;
-          cotizacion_clp_min?: number;
-          cotizacion_clp_max?: number;
-          tipo_servicio?: string;
-          nombre_proyecto?: string | null;
-          ubicacion?: string | null;
-        };
-      };
+          id?: string
+          created_at?: string
+          nombre?: string
+          email?: string
+          telefono?: string | null
+          tipo_espacio?: string | null
+          metros_cuadrados?: number | null
+          estado?: string | null
+          alcance?: string | null
+          urgencia?: string
+          presupuesto?: string | null
+          cotizacion_uf_min?: number
+          cotizacion_uf_max?: number
+          cotizacion_clp_min?: number
+          cotizacion_clp_max?: number
+          tipo_servicio?: string
+          nombre_proyecto?: string | null
+          ubicacion?: string | null
+        }
+      }
+      archivos_cotizacion: {
+        Row: {
+          id: string
+          cotizacion_id: string
+          created_at: string
+          url: string
+          nombre: string
+          tipo: string | null
+          tamano: number | null
+        }
+        Insert: {
+          id?: string
+          cotizacion_id: string
+          created_at?: string
+          url: string
+          nombre: string
+          tipo?: string | null
+          tamano?: number | null
+        }
+        Update: {
+          id?: string
+          cotizacion_id?: string
+          created_at?: string
+          url?: string
+          nombre?: string
+          tipo?: string | null
+          tamano?: number | null
+        }
+      }
+      admin_users: {
+        Row: {
+          id: string
+          email: string
+          created_at: string
+          role: string
+          nombre: string | null
+          cargo: string | null
+          activo: boolean | null
+        }
+        Insert: {
+          id?: string
+          email: string
+          created_at?: string
+          role?: string
+          nombre?: string | null
+          cargo?: string | null
+          activo?: boolean | null
+        }
+        Update: {
+          id?: string
+          email?: string
+          created_at?: string
+          role?: string
+          nombre?: string | null
+          cargo?: string | null
+          activo?: boolean | null
+        }
+      }
       proyecto_comentarios: {
         Row: {
-          id: string;
-          proyecto_id: string;
-          usuario_id: string;
-          contenido: string;
-          menciones: string[] | null;
-          created_at: string;
-          updated_at: string;
-        };
+          id: string
+          proyecto_id: string
+          usuario_id: string
+          contenido: string
+          menciones: string[] | null
+          created_at: string
+          updated_at: string
+        }
         Insert: {
-          id?: string;
-          proyecto_id: string;
-          usuario_id: string;
-          contenido: string;
-          menciones?: string[] | null;
-          created_at?: string;
-          updated_at?: string;
-        };
+          id?: string
+          proyecto_id: string
+          usuario_id: string
+          contenido: string
+          menciones?: string[] | null
+          created_at?: string
+          updated_at?: string
+        }
         Update: {
-          id?: string;
-          proyecto_id?: string;
-          usuario_id?: string;
-          contenido?: string;
-          menciones?: string[] | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-      };
+          id?: string
+          proyecto_id?: string
+          usuario_id?: string
+          contenido?: string
+          menciones?: string[] | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
       proyectos: {
         Row: {
-          id: string;
-          created_at: string;
-          nombre: string;
-          descripcion: string | null;
-          cliente_nombre: string;
-          cliente_email: string;
-          cliente_telefono: string | null;
-          fecha_inicio: string | null;
-          fecha_fin_estimada: string | null;
-          presupuesto_total: number | null;
-          monto_pagado: number | null;
-          porcentaje_completado: number | null;
-          estado: string | null;
-          cotizacion_id: string | null;
-          etapa_id: string | null;
-        };
+          id: string
+          created_at: string
+          nombre: string
+          descripcion: string | null
+          cliente_nombre: string
+          cliente_email: string
+          cliente_telefono: string | null
+          fecha_inicio: string | null
+          fecha_fin_estimada: string | null
+          presupuesto_total: number | null
+          monto_pagado: number | null
+          porcentaje_completado: number | null
+          estado: string | null
+          cotizacion_id: string | null
+          etapa_id: string | null
+        }
         Insert: {
-          id?: string;
-          created_at?: string;
-          nombre: string;
-          descripcion?: string | null;
-          cliente_nombre: string;
-          cliente_email: string;
-          cliente_telefono?: string | null;
-          fecha_inicio?: string | null;
-          fecha_fin_estimada?: string | null;
-          presupuesto_total?: number | null;
-          monto_pagado?: number | null;
-          porcentaje_completado?: number | null;
-          estado?: string | null;
-          cotizacion_id?: string | null;
-          etapa_id?: string | null;
-        };
+          id?: string
+          created_at?: string
+          nombre: string
+          descripcion?: string | null
+          cliente_nombre: string
+          cliente_email: string
+          cliente_telefono?: string | null
+          fecha_inicio?: string | null
+          fecha_fin_estimada?: string | null
+          presupuesto_total?: number | null
+          monto_pagado?: number | null
+          porcentaje_completado?: number | null
+          estado?: string | null
+          cotizacion_id?: string | null
+          etapa_id?: string | null
+        }
         Update: {
-          id?: string;
-          created_at?: string;
-          nombre?: string;
-          descripcion?: string | null;
-          cliente_nombre?: string;
-          cliente_email?: string;
-          cliente_telefono?: string | null;
-          fecha_inicio?: string | null;
-          fecha_fin_estimada?: string | null;
-          presupuesto_total?: number | null;
-          monto_pagado?: number | null;
-          porcentaje_completado?: number | null;
-          estado?: string | null;
-          cotizacion_id?: string | null;
-          etapa_id?: string | null;
-        };
-      };
+          id?: string
+          created_at?: string
+          nombre?: string
+          descripcion?: string | null
+          cliente_nombre?: string
+          cliente_email?: string
+          cliente_telefono?: string | null
+          fecha_inicio?: string | null
+          fecha_fin_estimada?: string | null
+          presupuesto_total?: number | null
+          monto_pagado?: number | null
+          porcentaje_completado?: number | null
+          estado?: string | null
+          cotizacion_id?: string | null
+          etapa_id?: string | null
+        }
+      }
       archivos_proyecto: {
         Row: {
-          id: string;
-          proyecto_id: string;
-          cotizacion_archivo_id: string | null;
-          url: string;
-          nombre: string;
-          tipo: string | null;
-          tamano: number | null;
-          descripcion: string | null;
-          created_at: string;
-        };
+          id: string
+          proyecto_id: string
+          cotizacion_archivo_id: string | null
+          url: string
+          nombre: string
+          tipo: string | null
+          tamano: number | null
+          descripcion: string | null
+          created_at: string
+        }
         Insert: {
-          id?: string;
-          proyecto_id: string;
-          cotizacion_archivo_id?: string | null;
-          url: string;
-          nombre: string;
-          tipo?: string | null;
-          tamano?: number | null;
-          descripcion?: string | null;
-          created_at?: string;
-        };
+          id?: string
+          proyecto_id: string
+          cotizacion_archivo_id?: string | null
+          url: string
+          nombre: string
+          tipo?: string | null
+          tamano?: number | null
+          descripcion?: string | null
+          created_at?: string
+        }
         Update: {
-          id?: string;
-          proyecto_id?: string;
-          cotizacion_archivo_id?: string | null;
-          url?: string;
-          nombre?: string;
-          tipo?: string | null;
-          tamano?: number | null;
-          descripcion?: string | null;
-          created_at?: string;
-        };
-      };
+          id?: string
+          proyecto_id?: string
+          cotizacion_archivo_id?: string | null
+          url?: string
+          nombre?: string
+          tipo?: string | null
+          tamano?: number | null
+          descripcion?: string | null
+          created_at?: string
+        }
+      }
       cotizacion_etapas: {
         Row: {
-          id: string;
-          nombre: string;
-          descripcion: string | null;
-          color: string;
-          orden: number;
-        };
+          id: string
+          nombre: string
+          descripcion: string | null
+          color: string
+          orden: number
+        }
         Insert: {
-          id?: string;
-          nombre: string;
-          descripcion?: string | null;
-          color: string;
-          orden?: number;
-        };
+          id?: string
+          nombre: string
+          descripcion?: string | null
+          color: string
+          orden?: number
+        }
         Update: {
-          id?: string;
-          nombre?: string;
-          descripcion?: string | null;
-          color?: string;
-          orden?: number;
-        };
-      };
+          id?: string
+          nombre?: string
+          descripcion?: string | null
+          color?: string
+          orden?: number
+        }
+      }
       proyecto_etapas: {
         Row: {
-          id: string;
-          nombre: string;
-          descripcion: string | null;
-          color: string;
-          orden: number;
-        };
+          id: string
+          nombre: string
+          descripcion: string | null
+          color: string
+          orden: number
+        }
         Insert: {
-          id?: string;
-          nombre: string;
-          descripcion?: string | null;
-          color: string;
-          orden?: number;
-        };
+          id?: string
+          nombre: string
+          descripcion?: string | null
+          color: string
+          orden?: number
+        }
         Update: {
-          id?: string;
-          nombre?: string;
-          descripcion?: string | null;
-          color?: string;
-          orden?: number;
-        };
-      };
+          id?: string
+          nombre?: string
+          descripcion?: string | null
+          color?: string
+          orden?: number
+        }
+      }
       cotizacion_comentarios: {
         Row: {
-          id: string;
-          cotizacion_id: string;
-          usuario_id: string;
-          usuario_nombre: string;
-          contenido: string;
-          created_at: string;
-        };
+          id: string
+          cotizacion_id: string
+          usuario_id: string
+          usuario_nombre: string
+          contenido: string
+          created_at: string
+        }
         Insert: {
-          id?: string;
-          cotizacion_id: string;
-          usuario_id: string;
-          usuario_nombre: string;
-          contenido: string;
-          created_at?: string;
-        };
+          id?: string
+          cotizacion_id: string
+          usuario_id: string
+          usuario_nombre: string
+          contenido: string
+          created_at?: string
+        }
         Update: {
-          id?: string;
-          cotizacion_id?: string;
-          usuario_id?: string;
-          usuario_nombre?: string;
-          contenido?: string;
-          created_at?: string;
-        };
-      };
+          id?: string
+          cotizacion_id?: string
+          usuario_id?: string
+          usuario_nombre?: string
+          contenido?: string
+          created_at?: string
+        }
+      }
       password_reset_tokens: {
         Row: {
-          email: string;
-          token: string;
-          user_id: string;
-          expires_at: string;
-          used: boolean;
-        };
+          email: string
+          token: string
+          user_id: string
+          expires_at: string
+          used: boolean
+        }
         Insert: {
-          email: string;
-          token: string;
-          user_id: string;
-          expires_at: string;
-          used?: boolean;
-        };
+          email: string
+          token: string
+          user_id: string
+          expires_at: string
+          used?: boolean
+        }
         Update: {
-          email?: string;
-          token?: string;
-          user_id?: string;
-          expires_at?: string;
-          used?: boolean;
-        };
-      };
-    };
+          email?: string
+          token?: string
+          user_id?: string
+          expires_at?: string
+          used?: boolean
+        }
+      }
+    }
     Views: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     Functions: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     Enums: {
-      [_ in never]: never;
-    };
-  };
+      [_ in never]: never
+    }
+  }
 }
