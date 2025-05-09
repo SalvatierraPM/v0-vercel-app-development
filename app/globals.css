@@ -5,12 +5,22 @@
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 255, 255, 255;
-  --background-end-rgb: 240, 240, 240;
+  --background-end-rgb: 248, 250, 252;
+
+  /* Paleta de colores para diseño de interiores */
+  --color-primary: 16, 185, 129; /* Emerald 600 */
+  --color-secondary: 5, 150, 105; /* Emerald 700 */
+  --color-accent: 79, 70, 229; /* Indigo 600 */
+  --color-neutral: 75, 85, 99; /* Gray 600 */
+  --color-light: 248, 250, 252; /* Slate 50 */
+  --color-dark: 30, 41, 59; /* Slate 800 */
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+    "Helvetica Neue", sans-serif;
 }
 
 @layer base {
@@ -23,22 +33,130 @@ body {
   h3 {
     @apply text-xl font-medium mb-2;
   }
+
+  /* Transiciones suaves para todos los elementos interactivos */
+  a,
+  button,
+  input,
+  select,
+  textarea {
+    @apply transition-all duration-200;
+  }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded transition-colors;
+    @apply bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded transition-colors shadow-sm hover:shadow;
   }
   .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-colors;
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-colors shadow-sm hover:shadow;
   }
   .input-field {
-    @apply border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-emerald-500;
+    @apply border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm;
   }
   .form-label {
     @apply block text-sm font-medium text-gray-700 mb-1;
   }
   .error-message {
     @apply text-red-500 text-sm mt-1;
+  }
+
+  /* Nuevos componentes estéticos */
+  .card {
+    @apply bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300;
+  }
+
+  .card-header {
+    @apply p-4 border-b border-gray-100;
+  }
+
+  .card-body {
+    @apply p-4;
+  }
+
+  .card-footer {
+    @apply p-4 border-t border-gray-100;
+  }
+
+  .badge {
+    @apply px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply bg-emerald-100 text-emerald-800;
+  }
+
+  .badge-secondary {
+    @apply bg-blue-100 text-blue-800;
+  }
+
+  .badge-success {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+
+  .badge-danger {
+    @apply bg-red-100 text-red-800;
+  }
+
+  .badge-neutral {
+    @apply bg-gray-100 text-gray-800;
+  }
+
+  /* Estilos para el tablero Kanban */
+  .kanban-column {
+    @apply bg-gray-50 rounded-lg p-2 min-h-[70vh] border border-gray-100;
+  }
+
+  .kanban-card {
+    @apply bg-white p-4 rounded-lg shadow-sm mb-3 cursor-pointer hover:shadow-md transition-all duration-200 border border-gray-100;
+  }
+
+  /* Estilos para barras de progreso */
+  .progress-bar {
+    @apply w-full bg-gray-200 rounded-full h-2 overflow-hidden;
+  }
+
+  .progress-bar-fill {
+    @apply bg-emerald-600 h-2 rounded-full transition-all duration-500 ease-in-out;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.4s ease-out;
+}
+
+/* Mejoras para dispositivos móviles */
+@media (max-width: 640px) {
+  .card {
+    @apply rounded-none border-l-0 border-r-0;
   }
 }

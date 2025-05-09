@@ -18,7 +18,7 @@ export default function UsuariosList() {
   const loadUsuarios = async () => {
     setIsLoading(true)
     try {
-      const { data, error } = await supabase.from("usuarios").select("*").order("created_at", { ascending: false })
+      const { data, error } = await supabase.from("admin_users").select("*").order("created_at", { ascending: false })
 
       if (error) throw error
       setUsuarios(data || [])
@@ -44,9 +44,9 @@ export default function UsuariosList() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Usuarios</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Usuarios Administradores</h1>
         <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-          Nuevo Usuario
+          Nuevo Administrador
         </button>
       </div>
 
@@ -55,7 +55,7 @@ export default function UsuariosList() {
           <div className="w-full md:w-1/3">
             <input
               type="text"
-              placeholder="Buscar por nombre, email o teléfono..."
+              placeholder="Buscar administrador por nombre o email..."
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
               value={searchTerm}
               onChange={handleSearch}
@@ -94,7 +94,7 @@ export default function UsuariosList() {
               {isLoading ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">
-                    Cargando usuarios...
+                    Cargando administradores...
                   </td>
                 </tr>
               ) : filteredUsuarios.length > 0 ? (
@@ -139,7 +139,7 @@ export default function UsuariosList() {
               ) : (
                 <tr>
                   <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">
-                    No se encontraron usuarios
+                    No se encontraron administradores
                   </td>
                 </tr>
               )}

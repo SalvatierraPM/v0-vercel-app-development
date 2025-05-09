@@ -108,7 +108,7 @@ export default function ProyectosTablero() {
         <p>{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm"
+          className="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm transition-colors"
         >
           Reintentar
         </button>
@@ -123,19 +123,19 @@ export default function ProyectosTablero() {
         <div className="flex space-x-2">
           <Link
             href="/admin/proyectos"
-            className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md text-sm font-medium"
+            className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md text-sm font-medium transition-colors"
           >
             Vista Lista
           </Link>
           <Link
             href="/admin/proyectos/nuevo"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
           >
             Nuevo Proyecto
           </Link>
           <Link
             href="/admin/etapas/proyecto"
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
           >
             Gestionar Etapas
           </Link>
@@ -147,11 +147,27 @@ export default function ProyectosTablero() {
           {etapas.map((etapa) => (
             <div key={etapa.id} className="flex-shrink-0 w-80">
               <div
-                className="rounded-t-lg p-3 text-white font-medium"
+                className="rounded-t-lg p-3 text-white font-medium shadow-sm"
                 style={{ backgroundColor: etapa.color || "#4B5563" }}
               >
                 <div className="flex justify-between items-center">
-                  <h3>{etapa.nombre}</h3>
+                  <h3 className="flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                      />
+                    </svg>
+                    {etapa.nombre}
+                  </h3>
                   <span className="bg-white bg-opacity-30 text-white text-xs font-semibold px-2 py-1 rounded-full">
                     {proyectos.filter((p) => p.etapa_id === etapa.id).length}
                   </span>
@@ -163,7 +179,7 @@ export default function ProyectosTablero() {
                   <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    className="bg-gray-100 rounded-b-lg p-2 min-h-[70vh]"
+                    className="bg-gray-50 rounded-b-lg p-2 min-h-[70vh] border border-gray-100"
                   >
                     {proyectos
                       .filter((proyecto) => proyecto.etapa_id === etapa.id)
@@ -174,36 +190,46 @@ export default function ProyectosTablero() {
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className="bg-white p-3 rounded-lg shadow-sm mb-2 cursor-pointer hover:shadow-md transition-shadow"
+                              className="bg-white p-4 rounded-lg shadow-sm mb-3 cursor-pointer hover:shadow-md transition-all duration-200 border border-gray-100 group"
                             >
-                              <div className="font-medium text-gray-900 mb-1">{proyecto.nombre}</div>
-                              <div className="text-sm text-gray-500 mb-1">Cliente: {proyecto.cliente_nombre}</div>
-                              {proyecto.presupuesto_total && (
-                                <div className="text-xs text-gray-500 mb-1">
-                                  Presupuesto: {formatCLP(proyecto.presupuesto_total)}
+                              <Link href={`/admin/proyectos/${proyecto.id}`} className="block">
+                                <div className="font-medium text-emerald-600 group-hover:text-emerald-800 transition-colors mb-2">
+                                  {proyecto.nombre}
                                 </div>
-                              )}
-                              {proyecto.porcentaje_completado !== null && (
-                                <div className="mt-2">
-                                  <div className="w-full bg-gray-200 rounded-full h-1.5">
-                                    <div
-                                      className="bg-emerald-600 h-1.5 rounded-full"
-                                      style={{ width: `${proyecto.porcentaje_completado}%` }}
-                                    ></div>
+                                <div className="text-sm text-gray-500 mb-2">Cliente: {proyecto.cliente_nombre}</div>
+                                {proyecto.presupuesto_total && (
+                                  <div className="text-xs text-gray-500 mb-2 flex items-center">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-3 w-3 mr-1"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                      />
+                                    </svg>
+                                    {formatCLP(proyecto.presupuesto_total)}
                                   </div>
-                                  <div className="text-xs text-gray-500 mt-1 text-right">
-                                    {proyecto.porcentaje_completado}% completado
+                                )}
+                                {proyecto.porcentaje_completado !== null && (
+                                  <div className="mt-3">
+                                    <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                                      <div
+                                        className="bg-emerald-600 h-1.5 rounded-full transition-all duration-500 ease-in-out"
+                                        style={{ width: `${proyecto.porcentaje_completado}%` }}
+                                      ></div>
+                                    </div>
+                                    <div className="text-xs text-gray-500 mt-1 text-right">
+                                      {proyecto.porcentaje_completado}% completado
+                                    </div>
                                   </div>
-                                </div>
-                              )}
-                              <div className="mt-2 flex justify-end">
-                                <Link
-                                  href={`/admin/proyectos/${proyecto.id}`}
-                                  className="text-xs text-emerald-600 hover:text-emerald-800"
-                                >
-                                  Ver detalles
-                                </Link>
-                              </div>
+                                )}
+                              </Link>
                             </div>
                           )}
                         </Draggable>
@@ -211,7 +237,23 @@ export default function ProyectosTablero() {
                     {provided.placeholder}
 
                     {proyectos.filter((p) => p.etapa_id === etapa.id).length === 0 && (
-                      <div className="text-center py-4 text-gray-400 text-sm">No hay proyectos en esta etapa</div>
+                      <div className="text-center py-8 text-gray-400 text-sm">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-10 w-10 mx-auto mb-2 text-gray-300"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1}
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                          />
+                        </svg>
+                        No hay proyectos en esta etapa
+                      </div>
                     )}
                   </div>
                 )}
@@ -221,9 +263,25 @@ export default function ProyectosTablero() {
 
           {/* Columna para proyectos sin etapa asignada */}
           <div className="flex-shrink-0 w-80">
-            <div className="rounded-t-lg p-3 bg-gray-500 text-white font-medium">
+            <div className="rounded-t-lg p-3 bg-gray-500 text-white font-medium shadow-sm">
               <div className="flex justify-between items-center">
-                <h3>Sin clasificar</h3>
+                <h3 className="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Sin clasificar
+                </h3>
                 <span className="bg-white bg-opacity-30 text-white text-xs font-semibold px-2 py-1 rounded-full">
                   {proyectos.filter((p) => !p.etapa_id).length}
                 </span>
@@ -235,7 +293,7 @@ export default function ProyectosTablero() {
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  className="bg-gray-100 rounded-b-lg p-2 min-h-[70vh]"
+                  className="bg-gray-50 rounded-b-lg p-2 min-h-[70vh] border border-gray-100"
                 >
                   {proyectos
                     .filter((proyecto) => !proyecto.etapa_id)
@@ -246,36 +304,46 @@ export default function ProyectosTablero() {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className="bg-white p-3 rounded-lg shadow-sm mb-2 cursor-pointer hover:shadow-md transition-shadow"
+                            className="bg-white p-4 rounded-lg shadow-sm mb-3 cursor-pointer hover:shadow-md transition-all duration-200 border border-gray-100 group"
                           >
-                            <div className="font-medium text-gray-900 mb-1">{proyecto.nombre}</div>
-                            <div className="text-sm text-gray-500 mb-1">Cliente: {proyecto.cliente_nombre}</div>
-                            {proyecto.presupuesto_total && (
-                              <div className="text-xs text-gray-500 mb-1">
-                                Presupuesto: {formatCLP(proyecto.presupuesto_total)}
+                            <Link href={`/admin/proyectos/${proyecto.id}`} className="block">
+                              <div className="font-medium text-emerald-600 group-hover:text-emerald-800 transition-colors mb-2">
+                                {proyecto.nombre}
                               </div>
-                            )}
-                            {proyecto.porcentaje_completado !== null && (
-                              <div className="mt-2">
-                                <div className="w-full bg-gray-200 rounded-full h-1.5">
-                                  <div
-                                    className="bg-emerald-600 h-1.5 rounded-full"
-                                    style={{ width: `${proyecto.porcentaje_completado}%` }}
-                                  ></div>
+                              <div className="text-sm text-gray-500 mb-2">Cliente: {proyecto.cliente_nombre}</div>
+                              {proyecto.presupuesto_total && (
+                                <div className="text-xs text-gray-500 mb-2 flex items-center">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-3 w-3 mr-1"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                  </svg>
+                                  {formatCLP(proyecto.presupuesto_total)}
                                 </div>
-                                <div className="text-xs text-gray-500 mt-1 text-right">
-                                  {proyecto.porcentaje_completado}% completado
+                              )}
+                              {proyecto.porcentaje_completado !== null && (
+                                <div className="mt-3">
+                                  <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                                    <div
+                                      className="bg-emerald-600 h-1.5 rounded-full transition-all duration-500 ease-in-out"
+                                      style={{ width: `${proyecto.porcentaje_completado}%` }}
+                                    ></div>
+                                  </div>
+                                  <div className="text-xs text-gray-500 mt-1 text-right">
+                                    {proyecto.porcentaje_completado}% completado
+                                  </div>
                                 </div>
-                              </div>
-                            )}
-                            <div className="mt-2 flex justify-end">
-                              <Link
-                                href={`/admin/proyectos/${proyecto.id}`}
-                                className="text-xs text-emerald-600 hover:text-emerald-800"
-                              >
-                                Ver detalles
-                              </Link>
-                            </div>
+                              )}
+                            </Link>
                           </div>
                         )}
                       </Draggable>
@@ -283,7 +351,23 @@ export default function ProyectosTablero() {
                   {provided.placeholder}
 
                   {proyectos.filter((p) => !p.etapa_id).length === 0 && (
-                    <div className="text-center py-4 text-gray-400 text-sm">No hay proyectos sin clasificar</div>
+                    <div className="text-center py-8 text-gray-400 text-sm">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-10 w-10 mx-auto mb-2 text-gray-300"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1}
+                          d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      No hay proyectos sin clasificar
+                    </div>
                   )}
                 </div>
               )}
