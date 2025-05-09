@@ -229,27 +229,6 @@ export default function QuoteWizard({ onComplete }: QuoteWizardProps) {
 
         setDebugInfo(`Cotización guardada con ID: ${cotizacion.id}`)
 
-        // Si es branding o ambos, guardar información de branding
-        if (data.tipo_servicio === "branding" || data.tipo_servicio === "ambos") {
-          setDebugInfo("Guardando información de branding...")
-          const { error: brandingError } = await supabase.from("branding_info").insert({
-            cotizacion_id: cotizacion.id,
-            tipo_branding: data.tipo_branding || "identidad_completa",
-            industria: data.industria || null,
-            tiene_logo: data.tiene_logo || false,
-            tiene_materiales: data.tiene_materiales || false,
-            descripcion_proyecto: data.descripcion_proyecto || null,
-          })
-
-          if (brandingError) {
-            setDebugInfo(`Error al guardar información de branding: ${brandingError.message}`)
-            console.error("Error al guardar información de branding:", brandingError)
-            // Continuamos con el flujo aunque falle el guardado de branding
-          } else {
-            setDebugInfo("Información de branding guardada correctamente")
-          }
-        }
-
         // Subir archivos si hay
         if (selectedFiles.length > 0) {
           setDebugInfo("Subiendo archivos...")

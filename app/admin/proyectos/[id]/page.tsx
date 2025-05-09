@@ -2,9 +2,6 @@ import { createServerClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { formatCLP } from "@/lib/utils"
-import ProyectoArchivos from "@/components/admin/ProyectoArchivos"
-import ProyectoPaletaColores from "@/components/admin/ProyectoPaletaColores"
-import ProyectoComentarios from "@/components/admin/ProyectoComentarios"
 
 export default async function ProyectoDetailPage({ params }: { params: { id: string } }) {
   const supabase = createServerClient()
@@ -190,34 +187,6 @@ export default async function ProyectoDetailPage({ params }: { params: { id: str
                 style={{ width: `${proyecto.porcentaje_completado}%` }}
               ></div>
             </div>
-          </div>
-        </div>
-
-        {/* Sección de paleta de colores */}
-        <div className="mb-6">
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-            <ProyectoPaletaColores proyectoId={params.id} />
-          </div>
-        </div>
-
-        {/* Sección de archivos del proyecto */}
-        <div className="mb-6">
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-            <ProyectoArchivos proyectoId={params.id} />
-          </div>
-        </div>
-
-        {/* Sección de comentarios */}
-        <div className="mb-6">
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-            <ProyectoComentarios
-              proyectoId={params.id}
-              usuarioActual={{
-                id: adminUser.id,
-                nombre: adminUser.nombre || adminUser.email.split("@")[0],
-                email: adminUser.email,
-              }}
-            />
           </div>
         </div>
 

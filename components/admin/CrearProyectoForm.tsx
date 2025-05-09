@@ -6,7 +6,6 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { formatUF } from "@/lib/utils"
-import { Loader2 } from "lucide-react"
 
 interface Cotizacion {
   id: string
@@ -26,14 +25,6 @@ interface Cotizacion {
   created_at: string
 }
 
-interface Archivo {
-  id: string
-  cotizacion_id: string
-  url: string
-  nombre: string
-  created_at: string
-}
-
 interface CrearProyectoFormProps {
   cotizacionId?: string
 }
@@ -41,13 +32,11 @@ interface CrearProyectoFormProps {
 export default function CrearProyectoForm({ cotizacionId }: CrearProyectoFormProps) {
   const [cotizacion, setCotizacion] = useState<Cotizacion | null>(null)
   const [cotizaciones, setCotizaciones] = useState<Cotizacion[]>([])
-  const [archivos, setArchivos] = useState<Archivo[]>([])
   const [selectedCotizacionId, setSelectedCotizacionId] = useState<string>(cotizacionId || "")
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
-  const [transferirArchivos, setTransferirArchivos] = useState(true)
   const [formData, setFormData] = useState({
     nombre: "",
     descripcion: "",
@@ -92,9 +81,6 @@ export default function CrearProyectoForm({ cotizacionId }: CrearProyectoFormPro
                   ((cotizacionSeleccionada.cotizacion_uf_max + cotizacionSeleccionada.cotizacion_uf_min) / 2) * 100,
                 ) / 100,
             })
-
-            // Cargar archivos de la cotización
-            fetchArchivosCotizacion(cotizacionId)
           }
         }
       } catch (error) {
@@ -106,22 +92,7 @@ export default function CrearProyectoForm({ cotizacionId }: CrearProyectoFormPro
     }
 
     fetchCotizaciones()
-  }, [cotizacionId, supabase, formData])
-
-  const fetchArchivosCotizacion = async (id: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("archivos_cotizacion")
-        .select("*")
-        .eq("cotizacion_id", id)
-        .order("created_at", { ascending: false })
-
-      if (error) throw error
-      setArchivos(data || [])
-    } catch (error) {
-      console.error("Error al cargar archivos:", error)
-    }
-  }
+  }, [cotizacionId, supabase])
 
   const handleCotizacionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const id = e.target.value
@@ -142,60 +113,15 @@ export default function CrearProyectoForm({ cotizacionId }: CrearProyectoFormPro
           presupuesto_total:
             Math.round(((selectedCotizacion.cotizacion_uf_max + selectedCotizacion.cotizacion_uf_min) / 2) * 100) / 100,
         })
-
-        // Cargar archivos de la cotización seleccionada
-        fetchArchivosCotizacion(id)
       }
     } else {
       setCotizacion(null)
-      setArchivos([])
     }
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
-  }
-
-  const transferirArchivosCotizacion = async (proyectoId: string, cotizacionId: string) => {
-    if (!transferirArchivos || archivos.length === 0) return []
-
-    try {
-      // Preparar los datos para insertar en archivos_proyecto
-      const archivosProyecto = archivos.map((archivo) => ({
-        proyecto_id: proyectoId,
-        cotizacion_archivo_id: archivo.id,
-        url: archivo.url,
-        nombre: archivo.nombre,
-        tipo: determinarTipoArchivo(archivo.nombre),
-        created_at: new Date().toISOString(),
-      }))
-
-      // Insertar los archivos en la tabla archivos_proyecto
-      const { data, error } = await supabase.from("archivos_proyecto").insert(archivosProyecto).select()
-
-      if (error) throw error
-      return data
-    } catch (error) {
-      console.error("Error al transferir archivos:", error)
-      return []
-    }
-  }
-
-  const determinarTipoArchivo = (nombreArchivo: string) => {
-    const extension = nombreArchivo.split(".").pop()?.toLowerCase() || ""
-
-    if (["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(extension)) {
-      return "imagen"
-    } else if (["pdf", "doc", "docx", "txt", "rtf"].includes(extension)) {
-      return "documento"
-    } else if (["ai", "psd", "xd", "sketch", "fig"].includes(extension)) {
-      return "diseno"
-    } else if (["mp4", "mov", "avi", "webm"].includes(extension)) {
-      return "video"
-    }
-
-    return "otro"
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -230,11 +156,6 @@ export default function CrearProyectoForm({ cotizacionId }: CrearProyectoFormPro
         .select()
 
       if (error) throw error
-
-      // Si hay una cotización seleccionada y hay archivos, transferirlos al proyecto
-      if (selectedCotizacionId && archivos.length > 0 && transferirArchivos) {
-        await transferirArchivosCotizacion(data[0].id, selectedCotizacionId)
-      }
 
       setSuccess("Proyecto creado correctamente")
 
@@ -313,35 +234,6 @@ export default function CrearProyectoForm({ cotizacionId }: CrearProyectoFormPro
                 </p>
               </div>
             </div>
-
-            {archivos.length > 0 && (
-              <div className="mt-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-gray-700">Archivos adjuntos: {archivos.length}</p>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="transferirArchivos"
-                      checked={transferirArchivos}
-                      onChange={(e) => setTransferirArchivos(e.target.checked)}
-                      className="mr-2 h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="transferirArchivos" className="text-sm text-gray-600">
-                      Transferir archivos al proyecto
-                    </label>
-                  </div>
-                </div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {archivos.map((archivo) => (
-                    <div key={archivo.id} className="text-xs bg-gray-100 rounded px-2 py-1 flex items-center">
-                      <span className="truncate max-w-[150px]" title={archivo.nombre}>
-                        {archivo.nombre}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         )}
 
@@ -515,16 +407,9 @@ export default function CrearProyectoForm({ cotizacionId }: CrearProyectoFormPro
           <button
             type="submit"
             disabled={isSaving}
-            className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50 flex items-center"
+            className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50"
           >
-            {isSaving ? (
-              <>
-                <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                Guardando...
-              </>
-            ) : (
-              "Crear Proyecto"
-            )}
+            {isSaving ? "Guardando..." : "Crear Proyecto"}
           </button>
         </div>
       </form>
