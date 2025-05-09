@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import { getCotizaciones } from "@/lib/db-client"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -43,7 +44,7 @@ export default function CotizacionesList() {
   const cargarCotizaciones = async () => {
     try {
       setCargando(true)
-      const { data, error } = await supabase.from("cotizaciones").select("*").order("created_at", { ascending: false })
+      const { cotizaciones: data, error } = await getCotizaciones()
 
       if (error) {
         throw error

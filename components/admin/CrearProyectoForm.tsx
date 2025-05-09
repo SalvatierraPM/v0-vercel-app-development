@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import { getCotizacionById, createProyecto, updateCotizacion } from "@/lib/db-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -47,7 +48,7 @@ export default function CrearProyectoForm({ cotizacionId }: CrearProyectoFormPro
   const cargarCotizacion = async () => {
     try {
       setCargando(true)
-      const { data, error } = await supabase.from("cotizaciones").select("*").eq("id", cotizacionId).single()
+      const { cotizacion: data, error } = await getCotizacionById(cotizacionId as string)
 
       if (error) throw error
 
@@ -101,34 +102,27 @@ export default function CrearProyectoForm({ cotizacionId }: CrearProyectoFormPro
       }
 
       // Crear el proyecto
-      const { data: proyecto, error: proyectoError } = await supabase
-        .from("proyectos")
-        .insert({
-          nombre: formData.nombre,
-          cliente: formData.cliente,
-          email: formData.email,
-          telefono: formData.telefono,
-          tipo_espacio: formData.tipo_espacio,
-          metros_cuadrados: formData.metros_cuadrados ? Number.parseFloat(formData.metros_cuadrados) : null,
-          ubicacion: formData.ubicacion,
-          descripcion: formData.descripcion,
-          presupuesto: formData.presupuesto,
-          fecha_inicio: formData.fecha_inicio,
-          fecha_entrega_estimada: formData.fecha_entrega_estimada,
-          estado: formData.estado,
-          cotizacion_id: cotizacionId,
-        })
-        .select()
-        .single()
+      const { proyecto, error: proyectoError } = await createProyecto({
+        nombre: formData.nombre,
+        cliente: formData.cliente,
+        email: formData.email,
+        telefono: formData.telefono,
+        tipo_espacio: formData.tipo_espacio,
+        metros_cuadrados: formData.metros_cuadrados ? Number.parseFloat(formData.metros_cuadrados) : null,
+        ubicacion: formData.ubicacion,
+        descripcion: formData.descripcion,
+        presupuesto: formData.presupuesto,
+        fecha_inicio: formData.fecha_inicio,
+        fecha_entrega_estimada: formData.fecha_entrega_estimada,
+        estado: formData.estado,
+        cotizacion_id: cotizacionId,
+      })
 
       if (proyectoError) throw proyectoError
 
       // Si hay una cotización asociada, actualizar su estado
       if (cotizacionId) {
-        const { error: updateError } = await supabase
-          .from("cotizaciones")
-          .update({ estado: "aprobada" })
-          .eq("id", cotizacionId)
+        const { error: updateError } = await updateCotizacion(cotizacionId, { estado: "aprobada" })
 
         if (updateError) throw updateError
       }
